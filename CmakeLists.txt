@@ -8,6 +8,7 @@ find_package(Vulkan REQUIRED)
 
 # CMake module
 include(FetchContent)
+include(CompileShaders.cmake)
 
 # GLFW
 FetchContent_Declare(
@@ -32,28 +33,28 @@ FetchContent_MakeAvailable(glm)
 
 # Main executable
 add_executable(${PROJECT_NAME} source/main.cpp)
+add_dependencies(${PROJECT_NAME} CompileShaders)
 
-
-function(compile_shaders) 
-    message("====== Compiling Shaders ======")
-    set(extensions ".vert" ".frag" ".comp" ".geom" ".tccs" ".tecs")
-    foreach(extension ${extensions})
-        file(GLOB sourceFiles LIST_DIRECTORIES false RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}/shaders CONFIGURE_DEPENDS shaders/*${extension})
-        message("sourcefiles for extension ${extension}: ${sourceFiles}")
-        foreach(file ${sourceFiles})
-            message("compiling ${file} to ${file}.spv")
-            execute_process(
-                COMMAND C:/VulkanSDK/1.4.321.1/Bin/glslc.exe
-                ${CMAKE_CURRENT_SOURCE_DIR}/shaders/${file}
-                -o ${CMAKE_CURRENT_BINARY_DIR}/shaders/${file}.spv
-                )
-        endforeach()
-    endforeach()
-    message("====== Finsihed compiling Shaders ======")
-endfunction()
-
-make_directory(shaders)
-compile_shaders()
+#function(compile_shaders) 
+#    message("====== Compiling Shaders ======")
+#    set(extensions ".vert" ".frag" ".comp" ".geom" ".tccs" ".tecs")
+#    foreach(extension ${extensions})
+#        file(GLOB sourceFiles LIST_DIRECTORIES false RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}/shaders CONFIGURE_DEPENDS shaders/*${extension})
+#        message("sourcefiles for extension ${extension}: ${sourceFiles}")
+#        foreach(file ${sourceFiles})
+#            message("compiling ${file} to ${file}.spv")
+#            execute_process(
+#                COMMAND C:/VulkanSDK/1.4.321.1/Bin/glslc.exe
+#                ${CMAKE_CURRENT_SOURCE_DIR}/shaders/${file}
+#                -o ${CMAKE_CURRENT_BINARY_DIR}/shaders/${file}.spv
+#                )
+#        endforeach()
+#    endforeach()
+#    message("====== Finsihed compiling Shaders ======")
+#endfunction()
+#
+#make_directory(shaders)
+#compile_shaders()
 #file(COPY ${CMAKE_SOURCE_DIR}/shaders DESTINATION ${CMAKE_BINARY_DIR}/)
 
 target_link_libraries(${PROJECT_NAME}
