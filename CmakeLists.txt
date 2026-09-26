@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.16)
+cmake_minimum_required(VERSION 4.00)
 project(AnEngine)
 
 set(CMAKE_CXX_STANDARD 20)
@@ -8,13 +8,13 @@ find_package(Vulkan REQUIRED)
 
 # CMake module
 include(FetchContent)
-include(CompileShaders.cmake)
+include(shaders/CompileShaders.cmake)
 
 # GLFW
 FetchContent_Declare(
   glfw
   GIT_REPOSITORY https://github.com/glfw/glfw.git
-  GIT_TAG 3.4      # pick a stable version
+  GIT_TAG 3.5.1      # pick a stable version
 )
 set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
@@ -26,7 +26,7 @@ FetchContent_MakeAvailable(glfw)
 FetchContent_Declare(
   glm
   GIT_REPOSITORY https://github.com/g-truc/glm.git
-  GIT_TAG 0.9.9.8  # or newer release
+  GIT_TAG 1.0.3  # or newer release
 )
 set(GLM_TEST_ENABLE OFF CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(glm)
@@ -34,28 +34,6 @@ FetchContent_MakeAvailable(glm)
 # Main executable
 add_executable(${PROJECT_NAME} source/main.cpp)
 add_dependencies(${PROJECT_NAME} CompileShaders)
-
-#function(compile_shaders) 
-#    message("====== Compiling Shaders ======")
-#    set(extensions ".vert" ".frag" ".comp" ".geom" ".tccs" ".tecs")
-#    foreach(extension ${extensions})
-#        file(GLOB sourceFiles LIST_DIRECTORIES false RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}/shaders CONFIGURE_DEPENDS shaders/*${extension})
-#        message("sourcefiles for extension ${extension}: ${sourceFiles}")
-#        foreach(file ${sourceFiles})
-#            message("compiling ${file} to ${file}.spv")
-#            execute_process(
-#                COMMAND C:/VulkanSDK/1.4.321.1/Bin/glslc.exe
-#                ${CMAKE_CURRENT_SOURCE_DIR}/shaders/${file}
-#                -o ${CMAKE_CURRENT_BINARY_DIR}/shaders/${file}.spv
-#                )
-#        endforeach()
-#    endforeach()
-#    message("====== Finsihed compiling Shaders ======")
-#endfunction()
-#
-#make_directory(shaders)
-#compile_shaders()
-#file(COPY ${CMAKE_SOURCE_DIR}/shaders DESTINATION ${CMAKE_BINARY_DIR}/)
 
 target_link_libraries(${PROJECT_NAME}
     Vulkan::Vulkan

@@ -1,5 +1,6 @@
 set(SHADER_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/shaders)
 set(SHADER_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/shaders)
+set(VULKAN_VERSION 1.4.357.0)
 
 file(GLOB SHADER_FILES CONFIGURE_DEPENDS 
     ${SHADER_SOURCE_DIR}/*.vert
@@ -19,7 +20,7 @@ foreach(shader ${SHADER_FILES})
     add_custom_command(
         OUTPUT ${spv}
         COMMAND ${CMAKE_COMMAND} -E make_directory ${SHADER_BINARY_DIR}
-        COMMAND C:/VulkanSDK/1.4.321.1/Bin/glslc.exe
+        COMMAND C:/VulkanSDK/${VULKAN_VERSION}/Bin/glslc.exe
                 ${shader}
                 -o ${spv}
         DEPENDS ${shader}
