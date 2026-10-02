@@ -9,7 +9,7 @@ find_package(Vulkan REQUIRED)
 # CMake module
 include(FetchContent)
 include(shaders/CompileShaders.cmake)
-include(textures/CopyTextures.cmake)
+include(assets/CopyAssets.cmake)
 
 # GLFW
 FetchContent_Declare(
@@ -35,7 +35,7 @@ FetchContent_MakeAvailable(glm)
 # Main executable
 add_executable(${PROJECT_NAME} source/main.cpp)
 add_dependencies(${PROJECT_NAME} CompileShaders)
-add_dependencies(${PROJECT_NAME} CopyTextures)
+add_dependencies(${PROJECT_NAME} CopyAssets)
 
 target_include_directories(${PROJECT_NAME} 
     PRIVATE
