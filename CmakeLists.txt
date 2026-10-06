@@ -8,8 +8,8 @@ find_package(Vulkan REQUIRED)
 
 # CMake module
 include(FetchContent)
-include(shaders/CompileShaders.cmake)
 include(assets/CopyAssets.cmake)
+include(assets/shaders/CompileShaders.cmake)
 
 # GLFW
 FetchContent_Declare(
@@ -33,13 +33,20 @@ set(GLM_TEST_ENABLE OFF CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(glm)
 
 # Main executable
-add_executable(${PROJECT_NAME} source/main.cpp)
-add_dependencies(${PROJECT_NAME} CompileShaders)
+add_executable(${PROJECT_NAME})
 add_dependencies(${PROJECT_NAME} CopyAssets)
+add_dependencies(${PROJECT_NAME} CompileShaders)
 
 target_include_directories(${PROJECT_NAME} 
     PRIVATE
-    lib
+    includes
+)
+
+target_sources(${PROJECT_NAME}
+    PRIVATE
+    "source/main.cpp"
+    "source/ARenderer.cpp"
+    "source/structs/Vertex.cpp"
 )
 
 target_link_libraries(${PROJECT_NAME}

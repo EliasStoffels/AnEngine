@@ -1,5 +1,5 @@
-set(SHADER_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/shaders)
-set(SHADER_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/shaders)
+set(SHADER_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/assets/shaders)
+set(SHADER_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/assets/shaders)
 set(VULKAN_VERSION 1.4.357.0)
 
 file(GLOB SHADER_FILES CONFIGURE_DEPENDS 
@@ -16,7 +16,6 @@ set(SPIRV_FILES "")
 foreach(shader ${SHADER_FILES})
     get_filename_component(fileName ${shader} NAME)
     set(spv ${SHADER_BINARY_DIR}/${fileName}.spv)
-
     add_custom_command(
         OUTPUT ${spv}
         COMMAND ${CMAKE_COMMAND} -E make_directory ${SHADER_BINARY_DIR}
@@ -30,6 +29,7 @@ foreach(shader ${SHADER_FILES})
 
     list(APPEND SPIRV_FILES ${spv})
 endforeach()
+
 
 add_custom_target(CompileShaders
     DEPENDS ${SPIRV_FILES}
