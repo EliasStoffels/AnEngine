@@ -1,18 +1,16 @@
 #include "arenderer/SwapChain.h"
 #include "arenderer/ImageView.h"
-#include "arenderer/Queries.h"
+#include "arenderer/context/PhysicalDevice.h"
 
 namespace arenderer {
-    void SwapChain::Create(VkDevice device, VkPhysicalDevice physicalDevice, VkSurfaceKHR surface, GLFWwindow* window) {
-        SwapChainSupportDetails swapChainSupport = QuerySwapChainSupport(physicalDevice, surface);
+    void SwapChain::Create(VkDevice device,const PhysicalDevice& physicalDevice, VkSurfaceKHR surface, GLFWwindow* window) {
+        VkSurfaceFormatKHR surfaceFormat = ChooseSwapSurfaceFormat(physicalDevice.swapChainSupportDetails.formats);
+        VkPresentModeKHR presentMode = ChooseSwapPresentMode(physicalDevice.swapChainSupportDetails.presentModes);
+        VkExtent2D extent = ChooseSwapExtent(physicalDevice.swapChainSupportDetails.capabilities, window);
 
-        VkSurfaceFormatKHR surfaceFormat = ChooseSwapSurfaceFormat(swapChainSupport.formats);
-        VkPresentModeKHR presentMode = ChooseSwapPresentMode(swapChainSupport.presentModes);
-        VkExtent2D extent = ChooseSwapExtent(swapChainSupport.capabilities, window);
-
-        uint32_t imageCount = swapChainSupport.capabilities.minImageCount + 1;
-        if (swapChainSupport.capabilities.maxImageCount > 0 && imageCount > swapChainSupport.capabilities.maxImageCount) {
-            imageCount = swapChainSupport.capabilities.maxImageCount;
+        uint32_t imageCount = physicalDevice.swapChainSupportDetails.capabilities.minImageCount + 1;
+        if (physicalDevice.swapChainSupportDetails.capabilities.maxImageCount > 0 && imageCount > physicalDevice.swapChainSupportDetails.capabilities.maxImageCount) {
+            imageCount = physicalDevice.swapChainSupportDetails.capabilities.maxImageCount;
         }
 
         VkSwapchainCreateInfoKHR createInfo{};
@@ -25,10 +23,9 @@ namespace arenderer {
         createInfo.imageArrayLayers = 1;
         createInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
 
-        QueueFamilyIndices indices = FindQueueFamilies(physicalDevice, surface);
-        uint32_t queueFamilyIndices[] = { indices.graphicsFamily.value(), indices.presentFamily.value() };
+        uint32_t queueFamilyIndices[] = { physicalDevice.queueFamilyIndices.graphicsFamily.value(), physicalDevice.queueFamilyIndices.presentFamily.value() };
 
-        if (indices.graphicsFamily != indices.presentFamily) {
+        if (physicalDevice.queueFamilyIndices.graphicsFamily != physicalDevice.queueFamilyIndices.presentFamily) {
             createInfo.imageSharingMode = VK_SHARING_MODE_CONCURRENT;
             createInfo.queueFamilyIndexCount = 2;
             createInfo.pQueueFamilyIndices = queueFamilyIndices;
@@ -39,7 +36,7 @@ namespace arenderer {
             createInfo.pQueueFamilyIndices = nullptr; // Optional
         }
 
-        createInfo.preTransform = swapChainSupport.capabilities.currentTransform;
+        createInfo.preTransform = physicalDevice.swapChainSupportDetails.capabilities.currentTransform;
         createInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
         createInfo.presentMode = presentMode;
         createInfo.clipped = VK_TRUE;

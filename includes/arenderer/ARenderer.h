@@ -9,7 +9,9 @@
 #include "arenderer/Vertex.h"
 #include "arenderer/SwapChain.h"
 #include "arenderer/Model.h"
-#include "arenderer/Instance.h"
+#include "arenderer/context/Instance.h"
+#include "arenderer/context/Device.h"
+#include "arenderer/context/PhysicalDevice.h"
 
 #include <chrono>
 #include <iostream>
@@ -42,8 +44,8 @@ namespace arenderer {
     private:
         // members
         Instance instance{};
-        VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
-        VkDevice device = VK_NULL_HANDLE;
+        PhysicalDevice physicalDevice{};
+        Device device{};
         VkQueue graphicsQueue = VK_NULL_HANDLE;
         VkQueue presentQueue = VK_NULL_HANDLE;
         VkRenderPass renderPass = VK_NULL_HANDLE;
@@ -76,8 +78,6 @@ namespace arenderer {
         VkImage depthImage;
         VkDeviceMemory depthImageMemory;
         VkImageView depthImageView;
-
-        VkSampleCountFlagBits msaaSamples = VK_SAMPLE_COUNT_1_BIT;
 
         VkImage colorImage;
         VkDeviceMemory colorImageMemory;
@@ -167,17 +167,9 @@ namespace arenderer {
         // debug setup (obv)
         void SetupDebugMessenger();
 
-        // choose physical device
-        //==============================================================================================================================================
-        void PickPhysicalDevice();
-        // device suitablity check
-        bool IsDeviceSuitable(VkPhysicalDevice device);
-        bool CheckDeviceExtensionSupport(VkPhysicalDevice device);
         //create swapchain
         //==========================================================================================================================================
         void RecreateSwapChain();
-        // find queue familys obv
-        void CreateLogicalDevice();
 
         // shaders
         //==============================================================================================================================================

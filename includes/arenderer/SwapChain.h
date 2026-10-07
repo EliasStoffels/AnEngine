@@ -6,7 +6,7 @@
 #include <GLFW/glfw3.h>
 
 namespace arenderer {
-
+    class PhysicalDevice;
 	class SwapChain {
     public:
         VkSwapchainKHR swapChain = VK_NULL_HANDLE;
@@ -16,7 +16,7 @@ namespace arenderer {
         std::vector<VkImageView> swapChainImageViews{};
         std::vector<VkFramebuffer> swapChainFramebuffers{};
 
-        void Create(VkDevice device, VkPhysicalDevice physicalDevice, VkSurfaceKHR surface, GLFWwindow* window);
+        void Create(VkDevice device, const PhysicalDevice& physicalDevice, VkSurfaceKHR surface, GLFWwindow* windoww);
         void CreateImageViews(VkDevice device);
         void Destroy(VkDevice device);
 

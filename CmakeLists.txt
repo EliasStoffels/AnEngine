@@ -49,7 +49,9 @@ target_sources(${PROJECT_NAME}
     "source/Vertex.cpp"
     "source/SwapCHain.cpp"
     "source/Model.cpp"
-    "source/Instance.cpp"
+    "source/context/Instance.cpp"
+    "source/context/Device.cpp"
+    "source/context/PhysicalDevice.cpp"
 )
 
 target_link_libraries(${PROJECT_NAME}
