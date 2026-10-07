@@ -12,6 +12,7 @@
 #include "arenderer/context/Instance.h"
 #include "arenderer/context/Device.h"
 #include "arenderer/context/PhysicalDevice.h"
+#include "arenderer/pipeline/RenderPass.h"
 
 #include <chrono>
 #include <iostream>
@@ -48,7 +49,7 @@ namespace arenderer {
         Device device{};
         VkQueue graphicsQueue = VK_NULL_HANDLE;
         VkQueue presentQueue = VK_NULL_HANDLE;
-        VkRenderPass renderPass = VK_NULL_HANDLE;
+        RenderPass renderPass{};
         VkDescriptorSetLayout descriptorSetLayout = VK_NULL_HANDLE;
         VkPipelineLayout pipelineLayout = VK_NULL_HANDLE;
         VkPipeline graphicsPipeline = VK_NULL_HANDLE;
@@ -74,14 +75,6 @@ namespace arenderer {
         VkDeviceMemory textureImageMemory;
         VkImageView textureImageView;
         VkSampler textureSampler;
-
-        VkImage depthImage;
-        VkDeviceMemory depthImageMemory;
-        VkImageView depthImageView;
-
-        VkImage colorImage;
-        VkDeviceMemory colorImageMemory;
-        VkImageView colorImageView;
 
         // required extensions
         std::vector<const char*> GetRequiredExtensions();
@@ -126,26 +119,16 @@ namespace arenderer {
         //==============================================================================================================================================
         void CreateCommandPool();
 
-        // renderpass
-        //==============================================================================================================================================
-        void CreateRenderPass();
-
         // image
         //==============================================================================================================================================
-        void CreateImage(uint32_t width, uint32_t height, uint32_t mipLevels, VkSampleCountFlagBits numSamples, VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage, VkMemoryPropertyFlags properties, VkImage& image, VkDeviceMemory& imageMemory);
         void CreateTextureImage();
         void GenerateMipmaps(VkImage image, VkFormat imageFormat, int32_t texWidth, int32_t texHeight, uint32_t mipLevels);
         void TransitionImageLayout(VkImage image, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout, uint32_t mipLevels);
         void CopyBufferToImage(VkBuffer buffer, VkImage image, uint32_t width, uint32_t height);
-        void CreateDepthResources();
-        void CreateColorResources();
-        VkFormat FindSupportedFormat(const std::vector<VkFormat>& candidates, VkImageTiling tiling, VkFormatFeatureFlags features);
-        VkFormat FindDepthFormat();
         bool HasStencilComponent(VkFormat format);
 
         // framebuffers
         //==============================================================================================================================================
-        void CreateFramebuffers();
         void CreateTextureImageView();
         void CreateTextureSampler();
 

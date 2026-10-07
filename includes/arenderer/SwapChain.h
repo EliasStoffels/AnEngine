@@ -16,8 +16,22 @@ namespace arenderer {
         std::vector<VkImageView> swapChainImageViews{};
         std::vector<VkFramebuffer> swapChainFramebuffers{};
 
+        VkImage depthImage;
+        VkDeviceMemory depthImageMemory;
+        VkImageView depthImageView;
+
+        VkImage colorImage;
+        VkDeviceMemory colorImageMemory;
+        VkImageView colorImageView;
+
+        VkFormat depthFormat;
+
         void Create(VkDevice device, const PhysicalDevice& physicalDevice, VkSurfaceKHR surface, GLFWwindow* windoww);
         void CreateImageViews(VkDevice device);
+        void CreateDepthResources(VkDevice device, const PhysicalDevice& physicalDevice);
+        void CreateColorResources(VkDevice device, const PhysicalDevice& physicalDevice);
+        void CreateFramebuffers(VkDevice device, VkRenderPass renderPass);
+        void CreateSyncObjects();
         void Destroy(VkDevice device);
 
     private:

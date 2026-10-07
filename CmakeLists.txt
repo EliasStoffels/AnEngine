@@ -52,6 +52,7 @@ target_sources(${PROJECT_NAME}
     "source/context/Instance.cpp"
     "source/context/Device.cpp"
     "source/context/PhysicalDevice.cpp"
+    "source/pipeline/RenderPass.cpp"
 )
 
 target_link_libraries(${PROJECT_NAME}
