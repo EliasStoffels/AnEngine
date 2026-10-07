@@ -1,14 +1,15 @@
 #ifndef ARENDERER_A_RENDERER_H
 #define ARENDERER_A_RENDERER_H
 
-#define GLFW_INCLUDE_VULKAN
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
-#include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
 #include "arenderer/Vertex.h"
+#include "arenderer/SwapChain.h"
+#include "arenderer/Model.h"
+#include "arenderer/Instance.h"
 
 #include <chrono>
 #include <iostream>
@@ -23,20 +24,6 @@
 
 // structs
 //==============================================================================================================================================
-struct QueueFamilyIndices {
-    std::optional<uint32_t> graphicsFamily;
-    std::optional<uint32_t> presentFamily;
-
-    bool IsComplete() {
-        return graphicsFamily.has_value() && presentFamily.has_value();
-    }
-};
-
-struct SwapChainSupportDetails {
-    VkSurfaceCapabilitiesKHR capabilities{};
-    std::vector<VkSurfaceFormatKHR> formats{};
-    std::vector<VkPresentModeKHR> presentModes{};
-};
 
 struct UniformBufferObject {
     glm::mat4 model;
@@ -47,24 +34,6 @@ struct UniformBufferObject {
 // global static functions
 //==============================================================================================================================================
 
-// proxy function for vkCreateDebugUtilsMessengerEXT (function is not automatically loaded so this one looks for it)
-inline VkResult CreateDebugUtilsMessengerEXT(VkInstance instance, const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkDebugUtilsMessengerEXT* pDebugMessenger) {
-    auto func = (PFN_vkCreateDebugUtilsMessengerEXT)vkGetInstanceProcAddr(instance, "vkCreateDebugUtilsMessengerEXT");
-    if (func != nullptr) {
-        return func(instance, pCreateInfo, pAllocator, pDebugMessenger);
-    }
-    else {
-        return VK_ERROR_EXTENSION_NOT_PRESENT;
-    }
-}
-
-// proxy function for vkDestroyDebugUtilsMessengerEXT (function is not automatically loaded so this one looks for it)
-inline void DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT debugMessenger, const VkAllocationCallbacks* pAllocator) {
-    auto func = (PFN_vkDestroyDebugUtilsMessengerEXT)vkGetInstanceProcAddr(instance, "vkDestroyDebugUtilsMessengerEXT");
-    if (func != nullptr) {
-        func(instance, debugMessenger, pAllocator);
-    }
-}
 
 namespace arenderer {
 	class ARenderer {
@@ -72,44 +41,30 @@ namespace arenderer {
         void Run();
     private:
         // members
-        GLFWwindow* window = nullptr;
-        VkInstance instance = nullptr;
-        VkDebugUtilsMessengerEXT debugMessenger = nullptr;
-        VkSurfaceKHR surface = nullptr;
+        Instance instance{};
         VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
-        VkDevice device = nullptr;
-        VkQueue graphicsQueue = nullptr;
-        VkQueue presentQueue = nullptr;
-        VkSwapchainKHR swapChain = nullptr;
-        std::vector<VkImage> swapChainImages{};
-        VkFormat swapChainImageFormat{};
-        VkExtent2D swapChainExtent{};
-        std::vector<VkImageView> swapChainImageViews{};
-        VkRenderPass renderPass = nullptr;
-        VkDescriptorSetLayout descriptorSetLayout = nullptr;
-        VkPipelineLayout pipelineLayout = nullptr;
-        VkPipeline graphicsPipeline = nullptr;
-        std::vector<VkFramebuffer> swapChainFramebuffers{};
-        VkCommandPool commandPool = nullptr;
+        VkDevice device = VK_NULL_HANDLE;
+        VkQueue graphicsQueue = VK_NULL_HANDLE;
+        VkQueue presentQueue = VK_NULL_HANDLE;
+        VkRenderPass renderPass = VK_NULL_HANDLE;
+        VkDescriptorSetLayout descriptorSetLayout = VK_NULL_HANDLE;
+        VkPipelineLayout pipelineLayout = VK_NULL_HANDLE;
+        VkPipeline graphicsPipeline = VK_NULL_HANDLE;
+        VkCommandPool commandPool = VK_NULL_HANDLE;
         std::vector<VkCommandBuffer> commandBuffers;
         std::vector<VkSemaphore> imageAvailableSemaphores;
         std::vector<VkSemaphore> renderFinishedSemaphores;
         std::vector<VkFence> inFlightFences;
-        bool framebufferResized = false;
         uint32_t currentFrame = 0;
+        SwapChain swapChain{};
 
-        std::vector<Vertex> vertices;
-        std::vector<uint32_t> indices;
-        VkBuffer vertexBuffer = nullptr;
-        VkDeviceMemory vertexBufferMemory = nullptr;
-        VkBuffer indexBuffer = nullptr;
-        VkDeviceMemory indexBufferMemory = nullptr;
+        Model model{};
 
         std::vector<VkBuffer> uniformBuffers{};
         std::vector<VkDeviceMemory> uniformBuffersMemory{};
         std::vector<void*> uniformBuffersMapped{};
 
-        VkDescriptorPool descriptorPool = nullptr;
+        VkDescriptorPool descriptorPool = VK_NULL_HANDLE;
         std::vector<VkDescriptorSet> descriptorSets;
 
         std::uint32_t mipLevels;
@@ -130,27 +85,6 @@ namespace arenderer {
 
         // required extensions
         std::vector<const char*> GetRequiredExtensions();
-
-        // extension callback
-        static VKAPI_ATTR VkBool32 VKAPI_CALL DebugCallback(
-            VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
-            VkDebugUtilsMessageTypeFlagsEXT messageType,
-            const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
-            void* pUserData) {
-
-            std::cerr << "validation layer: " << pCallbackData->pMessage << std::endl;
-
-            return VK_FALSE;
-        }
-
-        // window init
-        //==============================================================================================================================================
-        void InitWindow();
-
-        static void FramebufferResizeCallback(GLFWwindow* window, int width, int height) {
-            auto app = reinterpret_cast<ARenderer*>(glfwGetWindowUserPointer(window));
-            app->framebufferResized = true;
-        }
 
         // vulkan init
         //==============================================================================================================================================
@@ -179,16 +113,9 @@ namespace arenderer {
 
         // vertex buffer
         //==============================================================================================================================================
-        void CreateBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory);
-        void CreateVertexBuffer();
-        void CreateIndexBuffer();
-        VkCommandBuffer BeginSingleTimeCommands();
-        void EndSingleTimeCommands(VkCommandBuffer commandBuffer);
-        void CopyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
         void CreateUniformBuffers();
         void CreateDescriptorPool();
         void CreateDescriptorSets();
-        uint32_t FindMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
 
         // command buffer
         //==============================================================================================================================================
@@ -219,7 +146,6 @@ namespace arenderer {
         // framebuffers
         //==============================================================================================================================================
         void CreateFramebuffers();
-        VkImageView CreateImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags, uint32_t mipLevels);
         void CreateTextureImageView();
         void CreateTextureSampler();
 
@@ -247,20 +173,10 @@ namespace arenderer {
         // device suitablity check
         bool IsDeviceSuitable(VkPhysicalDevice device);
         bool CheckDeviceExtensionSupport(VkPhysicalDevice device);
-        SwapChainSupportDetails QuerySwapChainSupport(VkPhysicalDevice device);
-
-        //swap chain select functions
-        //==========================================================================================================================================
-        VkSurfaceFormatKHR ChooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats);
-        VkPresentModeKHR ChooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes);
-        VkExtent2D ChooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities);
         //create swapchain
         //==========================================================================================================================================
-        void CreateSwapChain();
-        void CreateImageViews();
         void RecreateSwapChain();
         // find queue familys obv
-        QueueFamilyIndices FindQueueFamilies(VkPhysicalDevice device);
         void CreateLogicalDevice();
 
         // shaders

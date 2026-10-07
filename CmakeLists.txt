@@ -46,7 +46,10 @@ target_sources(${PROJECT_NAME}
     PRIVATE
     "source/main.cpp"
     "source/ARenderer.cpp"
-    "source/structs/Vertex.cpp"
+    "source/Vertex.cpp"
+    "source/SwapCHain.cpp"
+    "source/Model.cpp"
+    "source/Instance.cpp"
 )
 
 target_link_libraries(${PROJECT_NAME}
