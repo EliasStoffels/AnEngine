@@ -2,6 +2,7 @@
 
 #include <stdexcept>
 #include <print>
+#include <iostream>
 
 constexpr uint32_t WIDTH = 1600;
 constexpr uint32_t HEIGHT = 1000;
@@ -47,7 +48,8 @@ namespace {
         const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
         void* pUserData) {
 
-        std::print( stderr, "validation layer: ", pCallbackData->pMessage);
+        std::print(stderr, "validation layer: {}\n", pCallbackData->pMessage);
+
 
         return VK_FALSE;
     }

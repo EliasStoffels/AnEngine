@@ -20,7 +20,7 @@ namespace arenderer {
         }
 
         if (!warn.empty())
-            std::print("========== Begin Model Load Warn ==========\n", warn ,"\n========== End Model Load Warn ==========\n");
+            std::print("========== Begin Model Load Warn ==========\n{}\n========== End Model Load Warn ==========\n", warn);
 
         std::unordered_map<Vertex, uint32_t> uniqueVertices{};
         for (const auto& shape : shapes) {
